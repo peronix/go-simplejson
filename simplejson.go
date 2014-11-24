@@ -55,7 +55,7 @@ func (j *Json) MarshalJSON() ([]byte, error) {
 
 // Set modifies `Json` map by `key` and `value`
 // Useful for changing single key/value in a `Json` object easily.
-func (j *Json) Set(key string, val interface{}) {
+func (j *Json) Set(val interface{}, key string) {
 	m, err := j.Map()
 	if err != nil {
 		return
@@ -65,7 +65,7 @@ func (j *Json) Set(key string, val interface{}) {
 
 // SetPath modifies `Json`, recursively checking/creating map keys for the supplied path,
 // and then finally writing in the value
-func (j *Json) SetPath(branch []string, val interface{}) {
+func (j *Json) SetPath(val interface{}, branch ...string) {
 	if len(branch) == 0 {
 		j.data = val
 		return
@@ -152,6 +152,24 @@ func (j *Json) GetIndex(index int) *Json {
 		}
 	}
 	return &Json{nil}
+}
+
+func (j *Json) MapEach(fn func(string, *Json)) {
+	a, err := j.Map()
+	if err == nil {
+		for index, _ := range a {
+			fn(index, &Json{a[index]})
+		}
+	}
+}
+
+func (j *Json) ArrayEach(fn func(*Json)) {
+	a, err := j.Array()
+	if err == nil {
+		for index, _ := range a {
+			fn(&Json{a[index]})
+		}
+	}
 }
 
 // CheckGet returns a pointer to a new `Json` object and
