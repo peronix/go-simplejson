@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"log"
+	"strconv"
 )
 
 // returns the current implementation version
@@ -344,6 +345,30 @@ func (j *Json) MustInt(args ...int) int {
 	}
 
 	return def
+}
+
+func (j *Json) MustIntFromString(args ...int) int {
+	var def int
+
+	switch len(args) {
+	case 0:
+	case 1:
+		def = args[0]
+	default:
+		log.Panicf("MustIntFromString() received too many arguments %d", len(args))
+	}
+
+	s, err := j.String()
+	if err != nil {
+		return def
+	}
+
+	i, err := strconv.Atoi(s)
+	if err != nil {
+		return def
+	}
+
+	return i
 }
 
 // MustFloat64 guarantees the return of a `float64` (with optional default)
